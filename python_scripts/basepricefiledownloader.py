@@ -32,11 +32,10 @@ for filename in filenames:
 ##These are the login credentials
 mypsswd = getpass.getpass('Partsnetweb Password:')
 mydlrcode = raw_input("Partsnetweb Dealer Code:")
-myusrname = raw_input("Partsnetweb User ID:"
+myusrname = raw_input("Partsnetweb User ID:")
 
 ##This logs in and obtains the token
-payload = {'rememberMe': 'on', 'password': mypsswd, 'dealerCode': 
- mydlrcode, 'dm': '4', 'userName': myusrname}
+payload = {'rememberMe': 'on', 'password': mypsswd, 'dealerCode': mydlrcode, 'dm': '4', 'userName': myusrname}
 loginurl = 'https://www.lemansnet.com/login'
 r = requests.post(loginurl, data=payload)
 token = r.headers['loginToken']
