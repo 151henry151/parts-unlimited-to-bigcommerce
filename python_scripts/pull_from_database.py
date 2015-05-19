@@ -13,7 +13,7 @@ try:
     cursor = conn.cursor()
     if conn.is_connected():
         print('Connected to MySQL database')
-        cursor.execute("SELECT * FROM CatalogContentExport WHERE partNumber=%s", (pn,))
+        cursor.execute("SELECT partImage FROM CatalogContentExport WHERE partNumber=%s", (pn,))
         row = cursor.fetchone()
         while row is not None:
             print(row)
