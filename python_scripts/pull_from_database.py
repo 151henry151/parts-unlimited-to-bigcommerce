@@ -4,6 +4,7 @@ from mysql.connector import Error
 import getpass 
 
 mysqlpasswd = getpass.getpass('Mysql root password:')
+pn = raw_input('Type a single part number with no dashes in here:')
 try:
     conn = mysql.connector.connect(host='localhost',
         database='PARTDATA',
