@@ -16,10 +16,29 @@ try:
         cursor.execute("SELECT partImage FROM CatalogContentExport WHERE partNumber=%s", (pn,))
         row = cursor.fetchone()
         while row is not None:
-            print(row)
+            print('Assigning image location')
+            partImageLocation = row[0]
+            row = cursor.fetchone()
+        cursor.execute("SELECT retailPrice FROM CatalogContentExport WHERE partNumber=%s", (pn,))
+        row = cursor.fetchone()
+        while row is not None:
+            print('Assigning retail price')
+            partRetailPrice = row[0]
+            row = cursor.fetchone()
+        cursor.execute("SELECT bullet1 FROM CatalogContentExport WHERE partNumber=%s", (pn,))
+        row = cursor.fetchone()
+        while row is not None:
+            print('Creating description from bulletpoints')
+            fullTextOfDescription = row[0]
             row = cursor.fetchone()
 except Error as e:
     print(e)
 finally:
     cursor.close()
     conn.close()
+
+print('Here is the data we have about this part:')
+print("We have the image location: " + partImageLocation)
+print("We have the bullet points for our description: " + fullTextOfDescription)
+print("We have the retail price: " + partRetailPrice)
+
