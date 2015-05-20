@@ -4,10 +4,10 @@ from mysql.connector import Error
 import getpass 
 
 mysqlpasswd = getpass.getpass('Mysql root password:')
-pn = raw_input('Type a single part number with no dashes in here:')
+#pn = raw_input('Type a single part number with no dashes in here:')
 
 #mysqlpasswd = "obscured"
-#pn = "03010101"
+pn = "03010101"
 
 try:
     conn = mysql.connector.connect(host='localhost',
@@ -30,11 +30,13 @@ try:
 	    tupleOfDescription = row[0:23]
             partSubName = row[27]
             #fullTextOfDescription = bulletPoint.join(tupleOfDescription)
-            fullTextOfDescription = ''.join(str(tupleOfDescription))
+            fullTextOfDescription = '.  '.join(x for x in tupleOfDescription if x is not None)
             partRetailPrice = row[24]
             partImageLocation = row[25]
             partName = row[26]
+            print(row[26])
             row = cursor.fetchone()
+            
         else:
             print("No Part Data Found for part number " + pn + " ! Double check the part number or consult with your system administrator (Henry, in this case)")
 except Error as e:
