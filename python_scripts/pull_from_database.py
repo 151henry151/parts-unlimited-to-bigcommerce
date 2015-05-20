@@ -5,6 +5,10 @@ import getpass
 
 mysqlpasswd = getpass.getpass('Mysql root password:')
 pn = raw_input('Type a single part number with no dashes in here:')
+
+#mysqlpasswd = "obscured"
+#pn = "03010101"
+
 try:
     conn = mysql.connector.connect(host='localhost',
         database='PARTDATA',
@@ -24,14 +28,12 @@ try:
         if row is not None:
             print("Pulling Data About Part Number " + pn)
 	    tupleOfDescription = row[0:23]
-            #partSubName = row[27]
-            #bulletPoint = " - "
+            partSubName = row[27]
             #fullTextOfDescription = bulletPoint.join(tupleOfDescription)
-            fullTextOfDescription = ''.join((tupleOfDescription))
+            fullTextOfDescription = ''.join(partSubName, str(tupleOfDescription))
             partRetailPrice = row[24]
             partImageLocation = row[25]
             partName = row[26]
-            partSubName = row[27]
             row = cursor.fetchone()
         else:
             print("No Part Data Found for part number " + pn + " ! Double check the part number or consult with your system administrator (Henry, in this case)")
