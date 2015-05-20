@@ -5,9 +5,11 @@ import getpass
 
 mysqlpasswd = getpass.getpass('Mysql root password:')
 pn = raw_input('Type a single part number with no dashes in here:')
+bulletnumber = 1
 try:
     conn = mysql.connector.connect(host='localhost',
         database='PARTDATA',
+        buffered=True,
         user='root',
         password=mysqlpasswd)
     cursor = conn.cursor()
@@ -25,12 +27,18 @@ try:
             print('Assigning retail price')
             partRetailPrice = row[0]
             row = cursor.fetchone()
-        cursor.execute("SELECT bullet1 FROM CatalogContentExport WHERE partNumber=%s", (pn,))
-        row = cursor.fetchone()
-        while row is not None:
-            print('Creating description from bulletpoints')
-            fullTextOfDescription = row[0]
+        for bullets in range (0, 23):
+            cursor.execute("SELECT bullet%s FROM CatalogContentExport WHERE partNumber=%s", (bulletnumber, pn,))
             row = cursor.fetchone()
+            #while row is not None:
+            if row is not None:
+                print("Creating description from bulletpoint" + str(bulletnumber))
+                tupleOfDescription = row[0:23]
+                #fullTextOfDescription = ''.join(tupleOfDescription)
+                row = cursor.fetchone()
+                bulletnumber = bulletnumber + 1
+            else:
+                print("No Part Data Found for part number " + pn + " ! Double check the part number or consult with your system administrator (Henry, in this case)")
 except Error as e:
     print(e)
 finally:
@@ -39,6 +47,5 @@ finally:
 
 print('Here is the data we have about this part:')
 print("We have the image location: " + partImageLocation)
-print("We have the bullet points for our description: " + fullTextOfDescription)
+print("We have the bullet points for our description: " + str(tupleOfDescription))
 print("We have the retail price: " + partRetailPrice)
-
