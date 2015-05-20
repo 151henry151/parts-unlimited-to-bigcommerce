@@ -30,7 +30,7 @@ try:
 	    tupleOfDescription = row[0:23]
             partSubName = row[27]
             #fullTextOfDescription = bulletPoint.join(tupleOfDescription)
-            fullTextOfDescription = ''.join(partSubName, str(tupleOfDescription))
+            fullTextOfDescription = ''.join(str(tupleOfDescription))
             partRetailPrice = row[24]
             partImageLocation = row[25]
             partName = row[26]
