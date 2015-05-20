@@ -5,7 +5,6 @@ import getpass
 
 mysqlpasswd = getpass.getpass('Mysql root password:')
 pn = raw_input('Type a single part number with no dashes in here:')
-bulletnumber = 1
 try:
     conn = mysql.connector.connect(host='localhost',
         database='PARTDATA',
@@ -15,30 +14,27 @@ try:
     cursor = conn.cursor()
     if conn.is_connected():
         print('Connected to MySQL database')
-        cursor.execute("SELECT partImage FROM CatalogContentExport WHERE partNumber=%s", (pn,))
+        cursor.execute("SELECT bullet1, bullet2, bullet3, bullet4, bullet5, bullet6, "
+                       "bullet7, bullet8, bullet9, bullet10, bullet11, bullet12, bullet13, "
+                       "bullet14, bullet15, bullet16, bullet17, bullet18, bullet19, bullet20, "
+                       "bullet21, bullet22, bullet23, bullet24, retailPrice, partImage, productName, "
+                       "partDescr FROM CatalogContentExport WHERE partNumber=%s", (pn,))
         row = cursor.fetchone()
-        while row is not None:
-            print('Assigning image location')
-            partImageLocation = row[0]
+        #while row is not None:
+        if row is not None:
+            print("Pulling Data About Part Number " + pn)
+	    tupleOfDescription = row[0:23]
+            #partSubName = row[27]
+            #bulletPoint = " - "
+            #fullTextOfDescription = bulletPoint.join(tupleOfDescription)
+            fullTextOfDescription = ''.join((tupleOfDescription))
+            partRetailPrice = row[24]
+            partImageLocation = row[25]
+            partName = row[26]
+            partSubName = row[27]
             row = cursor.fetchone()
-        cursor.execute("SELECT retailPrice FROM CatalogContentExport WHERE partNumber=%s", (pn,))
-        row = cursor.fetchone()
-        while row is not None:
-            print('Assigning retail price')
-            partRetailPrice = row[0]
-            row = cursor.fetchone()
-        for bullets in range (0, 23):
-            cursor.execute("SELECT bullet%s FROM CatalogContentExport WHERE partNumber=%s", (bulletnumber, pn,))
-            row = cursor.fetchone()
-            #while row is not None:
-            if row is not None:
-                print("Creating description from bulletpoint" + str(bulletnumber))
-                tupleOfDescription = row[0:23]
-                #fullTextOfDescription = ''.join(tupleOfDescription)
-                row = cursor.fetchone()
-                bulletnumber = bulletnumber + 1
-            else:
-                print("No Part Data Found for part number " + pn + " ! Double check the part number or consult with your system administrator (Henry, in this case)")
+        else:
+            print("No Part Data Found for part number " + pn + " ! Double check the part number or consult with your system administrator (Henry, in this case)")
 except Error as e:
     print(e)
 finally:
@@ -47,5 +43,7 @@ finally:
 
 print('Here is the data we have about this part:')
 print("We have the image location: " + partImageLocation)
-print("We have the bullet points for our description: " + str(tupleOfDescription))
+print("We have the bullet points for our description: " + fullTextOfDescription)
 print("We have the retail price: " + partRetailPrice)
+print("We have the part name: " + partName)
+print("We have the part sub-name: " + partSubName)
