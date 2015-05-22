@@ -1,4 +1,8 @@
-  GNU GENERAL PUBLIC LICENSE
+NOTE --
+
+I, Henry Romp, am the author of this project. I can be reached at 151henry151@gmail.com. Due to my firm stance against copyrighting code, I am making this code available to the public and using the GNU GENERAL PUBLIC LICENSE to license this software. 
+
+ GNU GENERAL PUBLIC LICENSE
                        Version 2, June 1991
 
  Copyright (C) 1989, 1991 Free Software Foundation, Inc., <http://fsf.org/>
