@@ -1,6 +1,10 @@
 #!/usr/bin/python
 
 # This script downloads the brand catalog content export zip files
+# At the time that it was written and executed, I was not yet informed that web scraping from PNW was not permitted.
+# Do not incorporate this script into any regularly scheduled updates
+# Instead manually download individual zips as new brands join parts unlimited
+# Automate checking for new brand zips and warning the user
 
 import requests
 from BeautifulSoup import BeautifulSoup
