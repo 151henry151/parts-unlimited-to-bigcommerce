@@ -14,12 +14,12 @@ We will refer to those two sources of data as the Base Price File Data and the C
 
 The Base Price File Data Transfer will update the PartsUnlimited table in the PARTDATA mySQL database.
 
-The Catalog Content Data Transfer will update the CatalogContentExport table in the PARTDATA mySQL database.
+The Catalog Content Data Transfer will update the CatalogContentExport table in the PARTDATA mySQL database. This functionality is not yet ready for use. DO NOT attempt to run the Catalog Content Data Transfer until all web-scraping functionality has been eliminated or we may inadvertently violate the terms of our agreement with Parts Unlimited.
 
   * Base Price File Data Transfer:
      * Execute update_base_header_database.bash
   * Catalog Content Data Transfer:
-     * Execute update_catalog_content_database.bash
+     * Execute update_catalog_content_database.bash -- NOT YET READY FOR USE
 
 **Components of Base Price File Data Transfer:**
 
@@ -29,15 +29,11 @@ The Catalog Content Data Transfer will update the CatalogContentExport table in 
   * 'table_init_command.sql' -- creates a table from the headers in BaseHeaders.csv
   * 'basepricefilecsvdataimport.sql' -- loads the data from BasePriceFile.csv into a MySQL table that  'table_init_command.sql' created
 
-**Tasks to complete Base Price File Data Transfer:**
-
-  * Let's make a script that pulls the headers from 'BasePriceFile.csv' into 'BaseHeaders.csv'
-
 **Components of Catalog Content Data Transfer:**
 
-  * 'catalog_content_export_zip_downloader.py' -- downloads the catalog content ZIP files
+  * 'catalog_content_export_zip_downloader.py' -- downloads the catalog content ZIP files -- This is the portion that incorporates web-scraping and needs to be modified to avoid violation of our agreements.
   * 'catalog_content_export_unzipper.py' -- Extracts the XML files from the catalog content ZIP files
   * 'xmlprocessor.bash' -- Processes the XML files to prepare them for import
   * 'load_data_in_xml.bash' -- Imports the data from the XML files to our mySQL database
-  * 'update_database.bash' -- Runs all of the other scripts in the XML program
+  * 'update_database.bash' -- Runs all of the other scripts in the XML program -- Has been temporarily modified to skip catalog_content_export_zip_downloader.py
 
