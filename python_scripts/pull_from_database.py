@@ -34,7 +34,6 @@ try:
             partRetailPrice = row[24]
             partImageLocation = row[25]
             partName = row[26]
-            print(row[26])
             row = cursor.fetchone()
             
         else:
