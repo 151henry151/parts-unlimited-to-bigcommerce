@@ -5,10 +5,7 @@ import getpass
 
 mysqlpasswd = getpass.getpass('Mysql root password:')
 
-pn = raw_input('Type a single part number with no dashes in here:')
-
 # Use raw_input pn for final version, use pn = "" for testing purposes
-
 #pn = "03010101"
 
 try:
@@ -19,7 +16,8 @@ try:
         password=mysqlpasswd)
     cursor = conn.cursor()
     if conn.is_connected():
-        print('Connected to MySQL database')
+        print('Connected to MySQL database\n...\n...')
+        pn = raw_input('Type a single part number with no dashes here to query database:')
         cursor.execute("SELECT bullet1, bullet2, bullet3, bullet4, bullet5, bullet6, "
                        "bullet7, bullet8, bullet9, bullet10, bullet11, bullet12, bullet13, "
                        "bullet14, bullet15, bullet16, bullet17, bullet18, bullet19, bullet20, "
@@ -28,7 +26,7 @@ try:
         row = cursor.fetchone()
         #while row is not None:
         if row is not None:
-            print("Pulling Data About Part Number " + pn)
+            print("Pulling Data About Part Number " + pn + "\n ... \n ...")
 	    tupleOfDescription = row[0:23]
             partSubName = row[27]
             #fullTextOfDescription = bulletPoint.join(tupleOfDescription)
@@ -46,9 +44,9 @@ finally:
     cursor.close()
     conn.close()
 
-print("Data in our MySQL database for part number " + pn + ":")
-print("Image URL: " + partImageLocation)
-print("Description: " + fullTextOfDescription)
-print("Current Retail price: " + partRetailPrice)
-print("Part name: " + partName)
+print("Data in our MySQL database for part number " + pn + ": \n")
+print("Image URL: " + partImageLocation + "\n")
+print("Description: " + fullTextOfDescription + "\n\n")
+print("Current Retail price: " + partRetailPrice + "\n")
+print("Part name: " + partName + "\n")
 print("Part sub-name: " + partSubName)
