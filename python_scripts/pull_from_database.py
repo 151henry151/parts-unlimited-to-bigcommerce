@@ -4,10 +4,12 @@ from mysql.connector import Error
 import getpass 
 
 mysqlpasswd = getpass.getpass('Mysql root password:')
-#pn = raw_input('Type a single part number with no dashes in here:')
 
-#mysqlpasswd = "obscured"
-pn = "03010101"
+pn = raw_input('Type a single part number with no dashes in here:')
+
+# Use raw_input pn for final version, use pn = "" for testing purposes
+
+#pn = "03010101"
 
 try:
     conn = mysql.connector.connect(host='localhost',
