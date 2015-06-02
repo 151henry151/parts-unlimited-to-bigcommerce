@@ -32,7 +32,7 @@ try:
 	    tupleOfDescription = row[0:23]
             partSubName = row[27]
             #fullTextOfDescription = bulletPoint.join(tupleOfDescription)
-            fullTextOfDescription = '.  '.join(x for x in tupleOfDescription if x is not None)
+            fullTextOfDescription = '. \n'.join(x for x in tupleOfDescription if x is not None)
             partRetailPrice = row[24]
             partImageLocation = row[25]
             partName = row[26]
@@ -46,9 +46,9 @@ finally:
     cursor.close()
     conn.close()
 
-print('Here is the data we have about this part:')
-print("We have the image location: " + partImageLocation)
-print("We have the bullet points for our description: " + fullTextOfDescription)
-print("We have the retail price: " + partRetailPrice)
-print("We have the part name: " + partName)
-print("We have the part sub-name: " + partSubName)
+print("Data in our MySQL database for part number " + pn + ":")
+print("Image URL: " + partImageLocation)
+print("Description: " + fullTextOfDescription)
+print("Current Retail price: " + partRetailPrice)
+print("Part name: " + partName)
+print("Part sub-name: " + partSubName)
