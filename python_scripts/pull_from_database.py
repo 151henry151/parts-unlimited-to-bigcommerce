@@ -2,11 +2,18 @@
 import mysql.connector
 from mysql.connector import Error
 import getpass 
+import argparse
 
-mysqlpasswd = getpass.getpass('Mysql root password:')
+parser = argparse.ArgumentParser()
+parser.add_argument("-t", "--testing", help="In testing mode, part number 03010101 will be used instead of prompting you to input a part number.", action="store_true")
+args = parser.parse_args()
+if args.testing:
+    print "Testing mode enabled, using part number 03010101"
+    pn = "03010101"
+else:
+    pn = raw_input('Type a single part number with no dashes here to query database:')
 
-# Use raw_input pn for final version, use pn = for testing purposes
-#pn = "03010101"
+mysqlpasswd = getpass.getpass('Mysql server root password:')
 
 try:
     conn = mysql.connector.connect(host='localhost',
@@ -17,7 +24,6 @@ try:
     cursor = conn.cursor()
     if conn.is_connected():
         print('Connected to MySQL database\n...\n...')
-        pn = raw_input('Type a single part number with no dashes here to query database:')
         cursor.execute("SELECT bullet1, bullet2, bullet3, bullet4, bullet5, bullet6, "
                        "bullet7, bullet8, bullet9, bullet10, bullet11, bullet12, bullet13, "
                        "bullet14, bullet15, bullet16, bullet17, bullet18, bullet19, bullet20, "
@@ -29,7 +35,6 @@ try:
             print("Pulling Data About Part Number " + pn + "\n ... \n ...")
 	    tupleOfDescription = row[0:23]
             partSubName = row[27]
-            #fullTextOfDescription = bulletPoint.join(tupleOfDescription)
             fullTextOfDescription = '. \n'.join(x for x in tupleOfDescription if x is not None)
             partRetailPrice = row[24]
             partImageLocation = row[25]
@@ -44,7 +49,7 @@ finally:
     cursor.close()
     conn.close()
 
-print("Data in our MySQL database for part number " + pn + ": \n")
+print("The following data was found in our MySQL database for part number " + pn + " and was assigned to various variable names: \n")
 print("Image URL: " + partImageLocation + "\n")
 print("Description:\n\n -------------- \n\n" + fullTextOfDescription + "\n\n")
 print("Current Retail price: " + partRetailPrice + "\n")
