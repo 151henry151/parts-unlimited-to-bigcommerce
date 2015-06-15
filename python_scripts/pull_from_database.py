@@ -5,7 +5,7 @@ import getpass
 
 mysqlpasswd = getpass.getpass('Mysql root password:')
 
-# Use raw_input pn for final version, use pn = "" for testing purposes
+# Use raw_input pn for final version, use pn = for testing purposes
 #pn = "03010101"
 
 try:
@@ -46,7 +46,7 @@ finally:
 
 print("Data in our MySQL database for part number " + pn + ": \n")
 print("Image URL: " + partImageLocation + "\n")
-print("Description: " + fullTextOfDescription + "\n\n")
+print("Description:\n\n -------------- \n\n" + fullTextOfDescription + "\n\n")
 print("Current Retail price: " + partRetailPrice + "\n")
 print("Part name: " + partName + "\n")
 print("Part sub-name: " + partSubName)
