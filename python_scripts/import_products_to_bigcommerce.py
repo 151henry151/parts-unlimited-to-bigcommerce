@@ -1,23 +1,6 @@
 import requests, json, sys
 import mysql.connector
 
-##This script was written by Jonah Deinye (paid for with bitcoin!)
-##this is the script that creates bigcommerce products. in the current form
-##it pulls the product properties and images from the WPS API.
-##once I've got the whole Parts Unlimited database mirrored in my mysql database
-##and i've got all the images uploaded to my VPS, I will adapt this script to
-##create products from the properties and images in my database.
- 
-## WPS credentials and path
-#WPS_URL = 'https://www.wpswebservices.com/version2/wsPRODUCT.pgm'
-#DEALER_ID = 'Obscured'
-#PASSWORD = 'Obscured'
-#DEBUG = True
-
-## Insert the Parts Unlimited mySQL server credentials and path below this line 
-connection_object = mysql.connector.connect(user='root', database='partdata')
-cursor = connection_object.cursor()
-
 # BigCommerce credentials and URLs
 BIG_USER = 'obscured'
 BIG_KEY = '60f353d5de97844a3e21052da62a0843'
