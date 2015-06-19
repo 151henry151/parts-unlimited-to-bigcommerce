@@ -1,7 +1,13 @@
-import requests, json, sys
-import mysql.connector
+#!usr/bin/python
 
-# BigCommerce credentials and URLs
+import mysql.connector
+import json
+import sys
+from mysql.connector import Error
+import getpass 
+import argparse
+
+# Bigcommerce login credentials
 BIG_USER = 'obscured'
 BIG_KEY = '60f353d5de97844a3e21052da62a0843'
 BIG_API = 'https://store-6o9l9.mybigcommerce.com/api/v2/'
@@ -10,35 +16,7 @@ BIG_STORE_URL = BIG_API + '%s'
 BIG_STORE_PRODUCT_URL = BIG_API + 'products.json'
 IMAGE_LOCATION = 'http://www.wpsstatic.com/WPSIMAGES/'
 BRAND_IMAGE = 'http://162.243.58.11/comingsoon.jpg'
- 
-# Script stuff
-OVERWRITE = True
- 
-## Dictionary for converting WPS properties to BigCommerce properties
-#conversion_dict = {
-#    'iname': 'name',
-#    'listprc': 'price',
-#    'itmweight': 'weight',
-#    #'producttype': 'categories',
-## Images will be handled by another script
-#    'mainimg': 'mainimg',
-#    'longdesc': 'description',
-#    'prtnmbr': 'sku',
-#    'brand_id': 'brand_id'
-#}
 
-## Insert a conversion dictionary below just like the one above but for Parts Unlimited 
-conversion_dict = {
-    'part_description': 'name',
-    'current_suggested_retail': 'price',
-    'placeholder': 'weight',
-
-brand_dictionary = {}
- 
-# Used when testing script
-CATNAME = 'testcat'
-CATID = '504'
- 
 def get_category_id(name):
     get_request = requests.get(BIG_API + 'categories.json', params={'name':name}, headers = BIG_HEADERS, auth=(BIG_USER, BIG_KEY))
     try:
@@ -58,37 +36,64 @@ def create_category(name):
     else:
         return get_category_id(name)
 
-## For the following section we will need to adapt it to query the mySQL server instead of the WPS API 
+parser = argparse.ArgumentParser()
+parser.add_argument("-t", "--testing", help="In testing mode, part number 03010101 will be used instead of prompting you to input a part number.", action="store_true")
+args = parser.parse_args()
+if args.testing:
+    print "Testing mode enabled, using part number 03010101"
+    pn = "03010101"
+else:
+    pn = raw_input('Type a single part number with no dashes here to query database:')
+
 
 def get_part_info(pn):
-    #
+    mysqlpasswd = getpass.getpass('Mysql server root password:')
 
-def get_part_info(pn):
-    # Create POST data
-    data = {'dealer': DEALER_ID, 'password': PASSWORD, 'prtnmbr': pn, 'output': 'json'}
-    
-    # Send request
-    part_response = requests.post(WPS_URL, data=data)
-    
-    # Convert JSON response and return docs array
     try:
-        response =  part_response.json()
-        #if DEBUG:
-        #    print response
-        return response['response'].get('docs', None)
-    
-    # If malformed response or error, return None
-    except:
-        if DEBUG:
-            print part_response.text
-        return None
- 
-##the image stuff below will need to be adapted after the image database has been mirrored onto the VPS
+        conn = mysql.connector.connect(host='localhost',
+            database='PARTDATA',
+            buffered=True,
+            user='root',
+            password=mysqlpasswd)
+        cursor = conn.cursor()
+        if conn.is_connected():
+            print('Connected to MySQL database\n...\n...')
+            cursor.execute("SELECT bullet1, bullet2, bullet3, bullet4, bullet5, bullet6, "
+                           "bullet7, bullet8, bullet9, bullet10, bullet11, bullet12, bullet13, "
+                           "bullet14, bullet15, bullet16, bullet17, bullet18, bullet19, bullet20, "
+                           "bullet21, bullet22, bullet23, bullet24, retailPrice, partImage, productName, "
+                           "partDescr FROM CatalogContentExport WHERE partNumber=%s", (pn,))
+            row = cursor.fetchone()
+            #while row is not None:
+            if row is not None:
+                print("Pulling Data About Part Number " + pn + "\n ... \n ...")
+	        tupleOfDescription = row[0:23]
+                partSubName = row[27]
+                fullTextOfDescription = '. \n'.join(x for x in tupleOfDescription if x is not None)
+                partRetailPrice = row[24]
+                partImageLocation = row[25]
+                partName = row[26]
+                row = cursor.fetchone()
+            
+            else:
+                print("No Part Data Found for part number " + pn + " ! Double check the part number or consult with your system administrator (Henry, in this case)")
+    except Error as e:
+        print(e)
+    finally:
+        cursor.close()
+        conn.close()
+    print("The following data was found in our MySQL database for part number " + pn + " and was assigned to various variable names: \n")
+    print("Image URL: " + partImageLocation + "\n")
+    print("Description:\n\n -------------- \n\n" + fullTextOfDescription + "\n\n")
+    print("Current Retail price: " + partRetailPrice + "\n")
+    print("Part name: " + partName + "\n")
+    print("Part sub-name: " + partSubName)
+
 def add_image(image_name, product_id):
     image_data = {'image_file': IMAGE_LOCATION + '%s' % (image_name,)}
     image_info = requests.post(BIG_API + 'products/%s/images.json' % (product_id,),
                                data=json.dumps(image_data), headers = BIG_HEADERS, auth=(BIG_USER, BIG_KEY))
- 
+
 def create_brand(brand_name):
     if brand_name in brand_dictionary.keys():
         return brand_dictionary[brand_name]
@@ -136,27 +141,8 @@ def create_item(pd):
     
     if 'weight' not in pd.keys():
         pd['weight'] = 0
-    
-    # Fix description (WPS returns description as an array instead of a string)
-    if pd.get('description', None):
-        pd['description'] = pd['description'][0]
-    
-    # Replace category names with category IDs
-    #if (pd.get('categories', None)):
-    #    for i, cat_name in enumerate(pd['categories']):
-    #        cat_id1 = get_category_id(cat_name) 
-    #        if not cat_id1:
-    #            print 'Creating category %s' % (cat_name,)
-    #            cat_id1 = create_category(cat_name)
-    #        pd['categories'][i] = cat_id1
- 
-    
-    # Remove mainimg property after setting image_filename
-    image_filename = pd.get('mainimg', '')
-    if image_filename:
-        pd.pop('mainimg')
-    
-    # Create BigCommerce product
+
+ # Create BigCommerce product
     rp = requests.post(BIG_STORE_URL % ('products.json',), data=json.dumps(pd), headers = BIG_HEADERS, auth=(BIG_USER, BIG_KEY))
     
     # Check for success
@@ -208,4 +194,3 @@ if __name__ == '__main__':
                     create_item(part)
     else:
         print 'Correct syntax is import.py categoryname FILE.TXT\nFILE.TXT is a plain text file with a part number on each line'
- 
