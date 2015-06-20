@@ -8,13 +8,13 @@ import getpass
 import argparse
 
 # Bigcommerce login credentials
-BIG_USER = 'obscured'
-BIG_KEY = '60f353d5de97844a3e21052da62a0843'
-BIG_API = 'https://store-6o9l9.mybigcommerce.com/api/v2/'
+BIG_USER = 'henry'
+BIG_KEY = '10f0f4f371f7953c4d7d7809b62463281f15c829'
+BIG_API = 'https://store-45eg5.mybigcommerce.com/api/v2/'
 BIG_HEADERS = {'Content-Type': 'application/json'}
 BIG_STORE_URL = BIG_API + '%s'
 BIG_STORE_PRODUCT_URL = BIG_API + 'products.json'
-IMAGE_LOCATION = 'http://www.wpsstatic.com/WPSIMAGES/'
+#IMAGE_LOCATION = 'http://www.wpsstatic.com/WPSIMAGES/'
 BRAND_IMAGE = 'http://162.243.58.11/comingsoon.jpg'
 
 def get_category_id(name):
