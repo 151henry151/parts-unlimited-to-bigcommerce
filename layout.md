@@ -26,16 +26,29 @@ In PARTDATA there are two tables
         | PartsUnlimited       |
         +----------------------+
 
-CatalogContentExport consists of the baseDealerPrice, the brandName,
-24 bullet points about the product which together form the
-description, the originalRetailPrice, the partDescr which is really
-more of a title than a description, the partImage which is a URL to
-the image, the partNumber, the partStatusDescr which indicates whether
-the product is in the current catalogs, the productId which I think is
-a unique identifier, the productImage which is another imagei URL,
-the productName, the punctuatedPartnumber, the retailPrice, any
-specialInstructions, the supplierNumber, the unit of measure, and 
-yourDealerPrice.
+CatalogContentExport consists of 
+
+*        the baseDealerPrice, 
+*       the brandName,
+*        24 bullet points about the product which together form the
+*        description, 
+*        the originalRetailPrice, 
+*        the partDescr which is really more of a title than a description,
+*        the partImage which is a URL to an image,
+*        the partNumber,
+*        the partStatusDescr which indicates whether the product is in the current catalogs,
+*        the productId which I think is a unique identifier,
+*        the productImage which is another image URL,
+*        the productName,
+*        the punctuatedPartnumber,
+*        the retailPrice,
+*        any specialInstructions,
+*        the supplierNumber, 
+*        the uom for Unit Of Measure, 
+*        and yourDealerPrice which is what we actually pay
+
+The table is not very well formed, most of the columns are varchar(255), I would like
+to rebuild it with better choices for each column.
 
         mysql> describe CatalogContentExport;
         +----------------------+--------------+------+-----+---------+-------+
@@ -90,19 +103,19 @@ However, we have another table, called PartsUnlimited, that has an additional
 many repeats from the previous table, but essentially, the data this has that the other 
 table doesn't is:
         
-        the availability (and which warehouses have it),
-        the date the part was added (which may prove useful for updating when new products are added),
-        whether the part is hazardous or not and whether it can be shipped via air or only ground,
-        whether the part is trademarked or not,
-        the advertising policy for the part (which determines whether the part is usable for 
-        promotions and sales, because many parts have a minimum advertised price policy which 
-        prevents us from putting them on sale online), 
-        whether the price of the part has changed today or not (which may also prove useful for updating),
-        the UPC code of the product,
-        the country of origin,
-        a "commodity code" that I'm not quite sure what is, but would like to learn about,
-        the weight of the item, 
-        whether or not it's considered to be "on close out,"
+ *       the availability (and which warehouses have it),
+ *       the date the part was added (which may prove useful for updating when new products are added),
+ *       whether the part is hazardous or not and whether it can be shipped via air or only ground,
+ *       whether the part is trademarked or not,
+ *       the advertising policy for the part (which determines whether the part is usable for 
+         promotions and sales, because many parts have a minimum advertised price policy which 
+         prevents us from putting them on sale online), 
+ *       whether the price of the part has changed today or not (which may also prove useful for updating),
+ *       the UPC code of the product,
+ *       the country of origin,
+ *       a "commodity code" that I'm not quite sure what is, but would like to learn about,
+ *       the weight of the item, 
+ *       whether or not it's considered to be "on close out,"
 
 And then occupying the majority of the table, there are separate columns that indicate whether the 
 product was shown and which page (if any) the product was shown on in each catalog, for this
@@ -114,6 +127,8 @@ to be present on the product page, however it would be a cool feature as there s
 better or more photos in the catalog, and there are sometimes (rarely) pieces of information in the
 catalogs that are not present anywhere in the product data. It would be a pretty slick feature,
 if it's achievable, and the data is all there.
+
+This table is also all varchar(255) and really needs to be rebuilt with more appropriate column types.
 
         mysql> describe PartsUnlimited;
         +--------------------------------------+--------------+------+-----+---------+-------+
