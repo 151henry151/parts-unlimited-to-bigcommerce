@@ -30,8 +30,7 @@ CatalogContentExport consists of
 
 *        the baseDealerPrice, 
 *       the brandName,
-*        24 bullet points about the product which together form the
-*        description, 
+*        24 bullet points about the product which together form the description, 
 *        the originalRetailPrice, 
 *        the partDescr which is really more of a title than a description,
 *        the partImage which is a URL to an image,
