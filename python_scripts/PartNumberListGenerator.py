@@ -30,9 +30,10 @@ try:
         cursor.execute(sql_command)     
         print("Pulling all part numbers from " + catalogname + " " + pagerangelow + " to " + catalogname + " " + pagerangehigh)
         row = cursor.fetchone()
-        #while row is not None:
-        if row is not None:
+        while row is not None:
+        #if row is not None:
             print(row[0])
+            row = cursor.fetchone()
         else:
             print("That's all the parts in that page range.")
 finally:
