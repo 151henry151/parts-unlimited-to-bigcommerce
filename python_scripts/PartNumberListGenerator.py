@@ -12,6 +12,8 @@ pagerangelow = raw_input('\n\nGenerate text file with all part numbers from page
 
 pagerangehigh = raw_input('\n\nTo page #: ')
 
+catalogname = catalogname + "_Page"
+
 mysqlpasswd = getpass.getpass('\n\nMysql server root password:')
 
 try:
@@ -23,7 +25,7 @@ try:
     cursor = conn.cursor()
     if conn.is_connected():
         print('\n\nConnected to MySQL database\n...\n...')
-        cursor.execute("SELECT Part_Number FROM PartsUnlimited WHERE %s"(catalogname) + "_Page BETWEEN" pagerangelow " AND" pagerangehigh)
+        cursor.execute("SELECT Part_Number FROM PartsUnlimited WHERE %s BETWEEN %s AND %s"(catalogname,pagerangelow,pagerangehigh,))     
         print("Pulling all part numbers from pages numbered between " + pagerangelow + "\n ..." + pagerangehigh + " \n ..." + "\n in catalog " + catalogname)
         row = cursor.fetchone()
         #while row is not None:
