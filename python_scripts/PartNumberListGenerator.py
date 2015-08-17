@@ -35,9 +35,7 @@ try:
         with open(textfilename, 'a') as f:
             for row in cursor.fetchall(): 
                 print("Writing " + row[0] + " to text file called " + textfilename)
-                li.append(row[0])
-            for item in li:
-                f.write('\n'.join(li)) 
+                f.write(row[0] + '\n') 
 finally:
     cursor.close()
     conn.close()

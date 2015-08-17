@@ -17,16 +17,16 @@ mysqlUsername = raw_input("Mysql user: ")
 mysqlPassword = getpass("Mysql password: ")
 
 # BigCommerce config
-bcHost = "store-t0e5k0r.mybigcommerce.com"
-bcUser = "henry"
-bcToken = "387887eb0156c255e3877871e56c0bf63a22437f"
+bcHost = "store-b063fy0.mybigcommerce.com"
+bcUser = "olizbu"
+bcToken = "0dd26c487a56e2e13ac098dbc29fb1390b256d6b"
 
 bcapi = bigcommerce.api.BigcommerceApi(host=bcHost, basic_auth=(bcUser, bcToken))
 
 # BigCommerce webdav config
-webdavUrl = "store-t0e5k0r.mybigcommerce.com"
-webdavUsername = "151henry151@gmail.com"
-webdavPassword = "0d8fa7a8b2f6270c50111a90a95a2beb"
+webdavUrl = "store-b063fy0.mybigcommerce.com"
+webdavUsername = "juanjmeneses@gmail.com"
+webdavPassword = "718a6ab846fb7b9df9a68cdfcf84088f"
 
 # Brand cache
 brand_cache = {}
@@ -44,9 +44,10 @@ def getPartsFromFile(file_name):
 	return parts
 
 def getPartFromDB(part_number):
-	part = None
+	part = {}
 	# try to make the connection
 	try:
+		print "Connecting to mysql..."
 		conn = mysql.connector.connect(
 			host = mysqlHost,
 			database = mysqlDatabase,
@@ -57,13 +58,14 @@ def getPartFromDB(part_number):
 		cursor = conn.cursor()
 		
 		if conn.is_connected():
+			print "Getting part %s from db"%part_number
 			cursor.execute("SELECT Weight FROM PartsUnlimited WHERE Part_Number=%s", (part_number,))
 			
 			row = cursor.fetchone()
 			if row:
 				partWeight = row[0]
 			else:
-				partWeight = None
+				partWeight = 0
 
 			cursor.execute("SELECT bullet1, bullet2, bullet3, bullet4, bullet5, bullet6, "
                        "bullet7, bullet8, bullet9, bullet10, bullet11, bullet12, bullet13, "
@@ -128,7 +130,7 @@ def uploadImageFromZip(zipUrl, partNumber, productID):
 
 def createProduct(product):
 
-	if not "weight" in product:
+	if not product["weight"]:
 		product["weight"] = 0
 
 	if not "availability" in product:
