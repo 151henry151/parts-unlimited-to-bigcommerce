@@ -31,10 +31,13 @@ try:
         print('\n\nConnected to MySQL database\n...\n...')
         cursor.execute(sql_command)     
         print("Pulling all part numbers from " + catalogname + " " + pagerangelow + " to " + catalogname + " " + pagerangehigh + " and printing them one per line to a text file called " + textfilename)
+        li = []
         with open(textfilename, 'a') as f:
             for row in cursor.fetchall(): 
-                print("Writing " + row[0] + "to text file called " + textfilename)
-                f.write(row[0]+"\n")
+                print("Writing " + row[0] + " to text file called " + textfilename)
+                li.append(row[0])
+            for item in li:
+                f.write("%s\n" % item) 
 finally:
     cursor.close()
     conn.close()
