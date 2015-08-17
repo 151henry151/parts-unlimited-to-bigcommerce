@@ -29,13 +29,8 @@ try:
         print('\n\nConnected to MySQL database\n...\n...')
         cursor.execute(sql_command)     
         print("Pulling all part numbers from " + catalogname + " " + pagerangelow + " to " + catalogname + " " + pagerangehigh)
-        row = cursor.fetchone()
-        while row is not None:
-        #if row is not None:
+        for row in cursor.fetchall(): 
             print(row[0])
-            row = cursor.fetchone()
-        else:
-            print("That's all the parts in that page range.")
 finally:
     cursor.close()
     conn.close()
