@@ -112,7 +112,7 @@ def uploadImageFromZip(zipUrl, partNumber, productID):
 	print "Extracting image for %s" % partNumber
 
 	with ZipFile("temp.zip", "r") as z:
-		images = z.namelist()[0]
+		images = z.namelist()
 		z.extractall()
 
 	# Connect to webdav
