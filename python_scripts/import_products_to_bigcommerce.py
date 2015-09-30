@@ -47,6 +47,7 @@ def getPartFromDB(part_number):
 	part = None
 	# try to make the connection
 	try:
+        print "Connecting to mysql..."
 		conn = mysql.connector.connect(
 			host = mysqlHost,
 			database = mysqlDatabase,
@@ -57,13 +58,14 @@ def getPartFromDB(part_number):
 		cursor = conn.cursor()
 		
 		if conn.is_connected():
+            print "Getting part %s from db"%part_number
 			cursor.execute("SELECT Weight FROM PartsUnlimited WHERE Part_Number=%s", (part_number,))
 			
 			row = cursor.fetchone()
 			if row:
 				partWeight = row[0]
 			else:
-				partWeight = None
+				partWeight = 0
 
 			cursor.execute("SELECT bullet1, bullet2, bullet3, bullet4, bullet5, bullet6, "
                        "bullet7, bullet8, bullet9, bullet10, bullet11, bullet12, bullet13, "
@@ -110,20 +112,21 @@ def uploadImageFromZip(zipUrl, partNumber, productID):
 	print "Extracting image for %s" % partNumber
 
 	with ZipFile("temp.zip", "r") as z:
-		imageName = z.namelist()[0]
+		images = z.namelist()
 		z.extractall()
 
 	# Connect to webdav
 	webdav = easywebdav.connect(webdavUrl, path="dav", auth=HTTPDigestAuth(webdavUsername, webdavPassword), protocol="https")
 
-	print "Uploading image for %s"%partNumber
-	webdav.upload(imageName, "product_images/import/%s.png" % partNumber)
+	print "Uploading images for %s"%partNumber
+    for image in images:
+	    webdav.upload(image, "product_images/import/%s" % image)
+        # Create the image
+        bcapi.ProductImages.create(productID, image_file=image)
 
-	print "Removing file: %s.png" %partNumber
-	os.remove(imageName)
+	    print "Removing file: %s" % image
+	    os.remove(image)
 	os.remove("temp.zip")
-	# Create the image
-	bcapi.ProductImages.create(productID, image_file="%s.png" % partNumber)
 
 
 def createProduct(product):
