@@ -48,6 +48,8 @@ def getPartsFromFile(file_name):
 
 def getPartFromDB(part_number):
     part = None
+    conn = None
+    cursor = None
     # try to make the connection
     try:
         print "Connecting to mysql..."
@@ -103,8 +105,11 @@ def getPartFromDB(part_number):
     except Error as e:
         print e
     finally:
-        cursor.close()
-        conn.close()
+        if cursor:
+            cursor.close()
+
+        if conn:
+            conn.close()
 
     return part
 
