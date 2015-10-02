@@ -237,7 +237,7 @@ def main():
 
                 createProduct(partData)
             else:
-                print "Impossible to get part % from DB" % part
+                print "Impossible to get part %s from DB" % part
 
 
 if __name__ == '__main__':
