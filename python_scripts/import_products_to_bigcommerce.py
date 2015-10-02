@@ -33,8 +33,9 @@ brand_cache = {}
 
 
 def getPartsFromFile(file_name):
-    f = open(file_name)
+    f = open(file_name, "r")
     lines = f.readlines()
+    f.close()
 
     parts = []
 
@@ -225,9 +226,13 @@ def main():
 
         for part in parts:
             partData = getPartFromDB(part)
-            partData["categories"] = [category]
 
-            createProduct(partData)
+            if partData != None:
+                partData["categories"] = [category]
+
+                createProduct(partData)
+            else:
+                print "Impossible to get part % from DB" % part
 
 
 if __name__ == '__main__':
