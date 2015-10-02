@@ -31,6 +31,7 @@ webdavPassword = "0d8fa7a8b2f6270c50111a90a95a2beb"
 # Brand cache
 brand_cache = {}
 
+
 def getPartsFromFile(file_name):
     f = open(file_name)
     lines = f.readlines()
@@ -43,22 +44,23 @@ def getPartsFromFile(file_name):
 
     return parts
 
+
 def getPartFromDB(part_number):
     part = None
     # try to make the connection
     try:
         print "Connecting to mysql..."
         conn = mysql.connector.connect(
-            host = mysqlHost,
-            database = mysqlDatabase,
-            buffered = True,
-            user = mysqlUsername,
-            password = mysqlPassword)
+            host=mysqlHost,
+            database=mysqlDatabase,
+            buffered=True,
+            user=mysqlUsername,
+            password=mysqlPassword)
 
         cursor = conn.cursor()
 
         if conn.is_connected():
-            print "Getting part %s from db"%part_number
+            print "Getting part %s from db" % part_number
             cursor.execute("SELECT Weight FROM PartsUnlimited WHERE Part_Number=%s", (part_number,))
 
             row = cursor.fetchone()
@@ -68,10 +70,11 @@ def getPartFromDB(part_number):
                 partWeight = 0
 
             cursor.execute("SELECT bullet1, bullet2, bullet3, bullet4, bullet5, bullet6, "
-                       "bullet7, bullet8, bullet9, bullet10, bullet11, bullet12, bullet13, "
-                       "bullet14, bullet15, bullet16, bullet17, bullet18, bullet19, bullet20, "
-                       "bullet21, bullet22, bullet23, bullet24, retailPrice, partImage, productName, "
-                       "partDescr, brandName, partImage FROM CatalogContentExport WHERE partNumber=%s", (part_number,))
+                           "bullet7, bullet8, bullet9, bullet10, bullet11, bullet12, bullet13, "
+                           "bullet14, bullet15, bullet16, bullet17, bullet18, bullet19, bullet20, "
+                           "bullet21, bullet22, bullet23, bullet24, retailPrice, partImage, productName, "
+                           "partDescr, brandName, partImage FROM CatalogContentExport WHERE partNumber=%s",
+                           (part_number,))
 
             row = cursor.fetchone()
             if row:
@@ -86,14 +89,14 @@ def getPartFromDB(part_number):
                 partFullDescription = ". \n".join(x for x in description if x is not None)
                 row = cursor.fetchone()
 
-                part = {"name":partName,
-                        "price":partRetailPrice,
-                        "weight":partWeight,
-                        "mainimg":partImageLocation,
-                        "description":partFullDescription,
-                        "sku":part_number,
-                        "brand":partBrandName,
-                        "imageZipUrl":partImage}
+                part = {"name": partName,
+                        "price": partRetailPrice,
+                        "weight": partWeight,
+                        "mainimg": partImageLocation,
+                        "description": partFullDescription,
+                        "sku": part_number,
+                        "brand": partBrandName,
+                        "imageZipUrl": partImage}
 
 
     except Error as e:
@@ -104,8 +107,8 @@ def getPartFromDB(part_number):
 
     return part
 
-def uploadImageFromZip(zipUrl, partNumber, productID):
 
+def uploadImageFromZip(zipUrl, partNumber, productID):
     print "Downloading image for %s" % partNumber
     urllib.urlretrieve(zipUrl, "temp.zip")
 
@@ -116,9 +119,10 @@ def uploadImageFromZip(zipUrl, partNumber, productID):
         z.extractall()
 
     # Connect to webdav
-    webdav = easywebdav.connect(webdavUrl, path="dav", auth=HTTPDigestAuth(webdavUsername, webdavPassword), protocol="https")
+    webdav = easywebdav.connect(webdavUrl, path="dav", auth=HTTPDigestAuth(webdavUsername, webdavPassword),
+                                protocol="https")
 
-    print "Uploading images for %s"%partNumber
+    print "Uploading images for %s" % partNumber
     for image in images:
         webdav.upload(image, "product_images/import/%s" % image)
         # Create the image
@@ -130,7 +134,6 @@ def uploadImageFromZip(zipUrl, partNumber, productID):
 
 
 def createProduct(product):
-
     if not "weight" in product:
         product["weight"] = 0
 
@@ -148,8 +151,10 @@ def createProduct(product):
     print "Creating product %s..." % product["name"]
     try:
         newProduct = bcapi.Products.create(name=product["name"], price=product["price"], weight=product["weight"],
-                                        description=product["description"], sku=product["sku"], categories=product["categories"],
-                                        availability=product["availability"], is_visible=product["is_visible"], type=product["type"])
+                                           description=product["description"], sku=product["sku"],
+                                           categories=product["categories"],
+                                           availability=product["availability"], is_visible=product["is_visible"],
+                                           type=product["type"])
 
         productID = newProduct["id"]
 
@@ -158,8 +163,9 @@ def createProduct(product):
     except bigcommerce.exception.HttpException as e:
         print e.response.json()[0]["message"]
 
+
 def createCategory(name):
-    print "Creating category %s" %name
+    print "Creating category %s" % name
     try:
         cat = bcapi.Categories.create(name=name)
 
@@ -178,9 +184,9 @@ def createCategory(name):
 
 
 def createBrand(name):
-    print "Creating brand %s"%name
+    print "Creating brand %s" % name
     if name in brand_cache:
-        print "Brand %s already exists" %name
+        print "Brand %s already exists" % name
         return brand_cache[name]
 
     try:
@@ -191,7 +197,7 @@ def createBrand(name):
         error = e.response.json()[0]
         if error["status"] == 409:
             if "duplicate_brand" in error["details"] and error["details"]["duplicate_brand"]:
-                print "Brand %s already exists" %name
+                print "Brand %s already exists" % name
                 return error["details"]["duplicate_brand"]
 
         else:
