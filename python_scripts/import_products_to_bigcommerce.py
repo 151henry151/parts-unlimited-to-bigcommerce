@@ -54,7 +54,7 @@ def getPartFromDB(part_number):
     try:
         print "Connecting to mysql..."
         conn = mysql.connector.connect(
-            host=mysqlHost,
+             host=mysqlHost,
             database=mysqlDatabase,
             buffered=True,
             user=mysqlUsername,
@@ -127,6 +127,10 @@ def uploadImageFromZip(zipUrl, partNumber, productID):
     # Connect to webdav
     webdav = easywebdav.connect(webdavUrl, path="dav", auth=HTTPDigestAuth(webdavUsername, webdavPassword),
                                 protocol="https")
+
+    # Check for import folder
+    if not webdav.exists("product_images/import"):
+        webdav.mkdir("product_images/import")
 
     print "Uploading images for %s" % partNumber
     for image in images:
