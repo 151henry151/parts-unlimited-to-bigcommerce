@@ -182,7 +182,7 @@ def createProduct(product):
             if "already exists" in error["details"]["conflict_reason"] and force_overwrite:
                 print "Updating product"
                 # Get the id
-                existingProduct = bcapi.Products.all(name=product["name"])
+                existingProduct = bcapi.Products.all(name=product["name"])[0]
 
                 # Update Product
                 bcapi.Products.get(existingProduct["id"]).update(price=product["price"], weight=product["weight"],
