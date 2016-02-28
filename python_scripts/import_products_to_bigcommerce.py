@@ -31,6 +31,7 @@ webdavPassword = "0d8fa7a8b2f6270c50111a90a95a2beb"
 # Brand cache
 brand_cache = {}
 
+force_overwrite = False
 
 def getPartsFromFile(file_name):
     f = open(file_name, "r")
@@ -175,7 +176,24 @@ def createProduct(product):
         uploadImageFromZip(product["imageZipUrl"], product["sku"], productID)
 
     except bigcommerce.exception.HttpException as e:
-        print e.response.json()[0]["message"]
+        error = e.response.json()[0]
+        if error["status"] == 409:
+            print "Product already exists."
+            if "already exists" in error["details"]["conflict_reason"] and force_overwrite:
+                print "Updating product"
+                # Get the id
+                existingProduct = bcapi.Products.all(name=product["name"])
+
+                # Update Product
+                bcapi.Products.get(existingProduct["id"]).update(price=product["price"], weight=product["weight"],
+                                           description=product["description"], categories=product["categories"],
+                                           availability=product["availability"], is_visible=product["is_visible"],
+                                           type=product["type"], brand_id=product["brand"])
+
+                # TODO Handle images
+
+        else:
+            print "ERROR %i %s" % (error["status"], error["message"])
 
 
 def createCategory(name):
@@ -232,7 +250,11 @@ def createBrand(name):
 # 		"brand": "newBrand"}
 
 def main():
+    global force_overwrite
     if len(sys.argv) > 2:
+        if len(sys.argv) > 3 and sys.argv[3] == "-f":
+            force_overwrite = True
+
         filename = sys.argv[2]
         category = createCategory(sys.argv[1])
         parts = getPartsFromFile(filename)
