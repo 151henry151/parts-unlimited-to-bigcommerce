@@ -76,7 +76,7 @@ def getPartFromDB(part_number):
                            "bullet7, bullet8, bullet9, bullet10, bullet11, bullet12, bullet13, "
                            "bullet14, bullet15, bullet16, bullet17, bullet18, bullet19, bullet20, "
                            "bullet21, bullet22, bullet23, bullet24, retailPrice, partImage, productName, "
-                           "partDescr, brandName, partImage FROM CatalogContentExport WHERE partNumber=%s",
+                           "partDescr, brandName, partImage, productImage FROM CatalogContentExport WHERE partNumber=%s",
                            (part_number,))
 
             row = cursor.fetchone()
@@ -88,11 +88,15 @@ def getPartFromDB(part_number):
                 partSubName = row[27]
                 partBrandName = row[28]
                 partImage = row[29]
+                productImage = row[30]
 
                 partFullDescription = ". \n".join(x for x in description if x is not None)
                 row = cursor.fetchone()
 
-                part = {"name": partName,
+                if partImage == None:
+                    partImage = productImage
+
+                part = {"name": partSubName,
                         "price": partRetailPrice,
                         "weight": partWeight,
                         "mainimg": partImageLocation,
@@ -164,7 +168,7 @@ def createProduct(product):
                                            description=product["description"], sku=product["sku"],
                                            categories=product["categories"],
                                            availability=product["availability"], is_visible=product["is_visible"],
-                                           type=product["type"])
+                                           type=product["type"], brand_id=product["brand"])
 
         productID = newProduct["id"]
 
