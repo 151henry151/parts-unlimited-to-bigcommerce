@@ -31,6 +31,7 @@ webdavPassword = "0d8fa7a8b2f6270c50111a90a95a2beb"
 # Brand cache
 brand_cache = {}
 
+force_overwrite = False
 
 def getPartsFromFile(file_name):
     f = open(file_name, "r")
@@ -54,7 +55,7 @@ def getPartFromDB(part_number):
     try:
         print "Connecting to mysql..."
         conn = mysql.connector.connect(
-            host=mysqlHost,
+             host=mysqlHost,
             database=mysqlDatabase,
             buffered=True,
             user=mysqlUsername,
@@ -76,7 +77,7 @@ def getPartFromDB(part_number):
                            "bullet7, bullet8, bullet9, bullet10, bullet11, bullet12, bullet13, "
                            "bullet14, bullet15, bullet16, bullet17, bullet18, bullet19, bullet20, "
                            "bullet21, bullet22, bullet23, bullet24, retailPrice, partImage, productName, "
-                           "partDescr, brandName, partImage FROM CatalogContentExport WHERE partNumber=%s",
+                           "partDescr, brandName, partImage, productImage FROM CatalogContentExport WHERE partNumber=%s",
                            (part_number,))
 
             row = cursor.fetchone()
@@ -88,11 +89,15 @@ def getPartFromDB(part_number):
                 partSubName = row[27]
                 partBrandName = row[28]
                 partImage = row[29]
+                productImage = row[30]
 
                 partFullDescription = ". \n".join(x for x in description if x is not None)
                 row = cursor.fetchone()
 
-                part = {"name": partName,
+                if partImage == None:
+                    partImage = productImage
+
+                part = {"name": partSubName,
                         "price": partRetailPrice,
                         "weight": partWeight,
                         "mainimg": partImageLocation,
@@ -128,6 +133,10 @@ def uploadImageFromZip(zipUrl, partNumber, productID):
     webdav = easywebdav.connect(webdavUrl, path="dav", auth=HTTPDigestAuth(webdavUsername, webdavPassword),
                                 protocol="https")
 
+    # Check for import folder
+    if not webdav.exists("product_images/import"):
+        webdav.mkdir("product_images/import")
+
     print "Uploading images for %s" % partNumber
     for image in images:
         webdav.upload(image, "product_images/import/%s" % image)
@@ -160,14 +169,31 @@ def createProduct(product):
                                            description=product["description"], sku=product["sku"],
                                            categories=product["categories"],
                                            availability=product["availability"], is_visible=product["is_visible"],
-                                           type=product["type"])
+                                           type=product["type"], brand_id=product["brand"])
 
         productID = newProduct["id"]
 
         uploadImageFromZip(product["imageZipUrl"], product["sku"], productID)
 
     except bigcommerce.exception.HttpException as e:
-        print e.response.json()[0]["message"]
+        error = e.response.json()[0]
+        if error["status"] == 409:
+            print "Product already exists."
+            if "already exists" in error["details"]["conflict_reason"] and force_overwrite:
+                print "Updating product"
+                # Get the id
+                existingProduct = bcapi.Products.all(sku=product["sku"])[0]
+
+                # Update Product
+                bcapi.Products.get(existingProduct["id"]).update(price=product["price"], weight=product["weight"],
+                                           description=product["description"], categories=product["categories"],
+                                           availability=product["availability"], is_visible=product["is_visible"],
+                                           type=product["type"], brand_id=product["brand"])
+
+                # TODO Handle images
+
+        else:
+            print "ERROR %i %s" % (error["status"], error["message"])
 
 
 def createCategory(name):
@@ -224,7 +250,11 @@ def createBrand(name):
 # 		"brand": "newBrand"}
 
 def main():
+    global force_overwrite
     if len(sys.argv) > 2:
+        if len(sys.argv) > 3 and sys.argv[3] == "-f":
+            force_overwrite = True
+
         filename = sys.argv[2]
         category = createCategory(sys.argv[1])
         parts = getPartsFromFile(filename)
